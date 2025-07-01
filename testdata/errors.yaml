@@ -1,0 +1,20 @@
+- code: 20001
+  key: PolicyNotFound
+  message: Policy not found
+  http: 404
+  grpc: 5
+  desc: Policy could not be located in the database
+
+- code: 20002
+  key: InvalidKind
+  message: Invalid policy kind
+  http: 400
+  grpc: 3
+  desc: Policy kind is not supported
+
+- code: 20003
+  key: InternalError
+  message: Internal server error
+  http: 500
+  grpc: 13
+  desc: An unexpected internal error occurred

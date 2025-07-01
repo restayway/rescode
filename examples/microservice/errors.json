@@ -1,0 +1,50 @@
+[
+  {
+    "code": 10001,
+    "key": "AuthenticationFailed",
+    "message": "Authentication failed",
+    "http": 401,
+    "grpc": 16,
+    "desc": "The provided credentials are invalid"
+  },
+  {
+    "code": 10002,
+    "key": "AuthorizationDenied",
+    "message": "Authorization denied",
+    "http": 403,
+    "grpc": 7,
+    "desc": "User does not have permission to perform this action"
+  },
+  {
+    "code": 20001,
+    "key": "PolicyNotFound",
+    "message": "Policy not found",
+    "http": 404,
+    "grpc": 5,
+    "desc": "Policy could not be located in the database"
+  },
+  {
+    "code": 20002,
+    "key": "InvalidPolicyKind",
+    "message": "Invalid policy kind",
+    "http": 400,
+    "grpc": 3,
+    "desc": "Policy kind is not supported"
+  },
+  {
+    "code": 30001,
+    "key": "RateLimitExceeded",
+    "message": "Rate limit exceeded",
+    "http": 429,
+    "grpc": 8,
+    "desc": "Request rate limit has been exceeded"
+  },
+  {
+    "code": 99999,
+    "key": "InternalServerError",
+    "message": "Internal server error",
+    "http": 500,
+    "grpc": 13,
+    "desc": "An unexpected internal error occurred"
+  }
+]

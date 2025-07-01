@@ -1,0 +1,20 @@
+- code: 1001
+  key: UserNotFound
+  message: User not found
+  http: 404
+  grpc: 5
+  desc: The specified user could not be found in the database
+
+- code: 1002
+  key: InvalidEmail
+  message: Invalid email address
+  http: 400
+  grpc: 3
+  desc: The provided email address is not valid
+
+- code: 1003
+  key: DatabaseError
+  message: Database connection failed
+  http: 500
+  grpc: 13
+  desc: Failed to connect to the database server
