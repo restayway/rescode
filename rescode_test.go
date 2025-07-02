@@ -59,22 +59,22 @@ func TestRC_WithWrappedError(t *testing.T) {
 
 func TestRC_Error(t *testing.T) {
 	tests := []struct {
-		name     string
-		message  string
+		name       string
+		message    string
 		wrappedErr error
-		expected string
+		expected   string
 	}{
 		{
-			name:     "without wrapped error",
-			message:  "simple error",
+			name:       "without wrapped error",
+			message:    "simple error",
 			wrappedErr: nil,
-			expected: "simple error",
+			expected:   "simple error",
 		},
 		{
-			name:     "with wrapped error",
-			message:  "parent error",
+			name:       "with wrapped error",
+			message:    "parent error",
 			wrappedErr: errors.New("child error"),
-			expected: "parent error: child error",
+			expected:   "parent error: child error",
 		},
 	}
 
@@ -243,7 +243,7 @@ func indexOf(s, substr string) int {
 // Benchmark tests for performance comparison
 func BenchmarkRC_Creation(b *testing.B) {
 	creator := New(1000, 400, codes.InvalidArgument, "benchmark error")
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = creator()
@@ -253,7 +253,7 @@ func BenchmarkRC_Creation(b *testing.B) {
 func BenchmarkRC_CreationWithError(b *testing.B) {
 	creator := New(1000, 400, codes.InvalidArgument, "benchmark error")
 	err := errors.New("wrapped error")
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = creator(err)
@@ -263,7 +263,7 @@ func BenchmarkRC_CreationWithError(b *testing.B) {
 func BenchmarkRC_Error(b *testing.B) {
 	creator := New(1000, 400, codes.InvalidArgument, "benchmark error")
 	rc := creator(errors.New("wrapped error"))
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = rc.Error()
@@ -273,7 +273,7 @@ func BenchmarkRC_Error(b *testing.B) {
 func BenchmarkRC_JSON(b *testing.B) {
 	creator := New(1000, 400, codes.InvalidArgument, "benchmark error", map[string]string{"key": "value"})
 	rc := creator(errors.New("wrapped error"))
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = rc.JSON()

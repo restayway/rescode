@@ -12,6 +12,13 @@ help:
 	@echo "  mod-tidy     - Run go mod tidy while preserving Go 1.20"
 	@echo "  mod-verify   - Verify Go version is correctly set to 1.20"
 	@echo "  mod-reset    - Reset go.mod to proper Go 1.20 state"
+	@echo "  fmt          - Format code with go fmt and gofmt -s"
+	@echo "  fmt-check    - Check if code is properly formatted"
+	@echo "  vet          - Run go vet"
+	@echo "  check        - Run all quality checks (fmt, vet, test)"
+	@echo "  quality-check- Run comprehensive quality checks for release"
+	@echo "  report-check - Check for Go Report Card issues"
+	@echo "  install-tools- Install quality check tools"
 	@echo "  build        - Build the project"
 	@echo "  clean        - Clean build artifacts"
 
@@ -131,8 +138,78 @@ mod-reset:
 	@make mod-verify
 	@echo "✓ go.mod reset successfully"
 
+# Format code
+fmt:
+	go fmt ./...
+	gofmt -s -w .
+
+fmt-check:
+	@echo "Checking code formatting..."
+	@if [ "$$(gofmt -s -d . | wc -l)" -eq 0 ]; then \
+		echo "✓ All files are properly formatted"; \
+	else \
+		echo "✗ Some files need formatting:"; \
+		gofmt -s -d .; \
+		echo "Run 'make fmt' to fix formatting issues"; \
+		exit 1; \
+	fi
+
+# Run go vet
+vet:
+	go vet ./...
+
+# Check for Go Report Card issues
+report-check:
+	@echo "=== Go Report Card Quality Check ==="
+	@echo ""
+	@echo "1. Checking gofmt..."
+	@make fmt-check
+	@echo ""
+	@echo "2. Checking go vet..."
+	@go vet ./...
+	@echo "✓ go vet passed"
+	@echo ""
+	@echo "3. Checking gocyclo (if available)..."
+	@if command -v gocyclo >/dev/null 2>&1; then \
+		gocyclo -over 15 .; \
+		if [ $$? -eq 0 ]; then echo "✓ gocyclo passed"; fi; \
+	else \
+		echo "⚠ gocyclo not installed (optional)"; \
+	fi
+	@echo ""
+	@echo "4. Checking ineffassign (if available)..."
+	@if command -v ineffassign >/dev/null 2>&1; then \
+		ineffassign .; \
+		if [ $$? -eq 0 ]; then echo "✓ ineffassign passed"; fi; \
+	else \
+		echo "⚠ ineffassign not installed (optional)"; \
+	fi
+	@echo ""
+	@echo "5. Checking misspell (if available)..."
+	@if command -v misspell >/dev/null 2>&1; then \
+		misspell -error .; \
+		if [ $$? -eq 0 ]; then echo "✓ misspell passed"; fi; \
+	else \
+		echo "⚠ misspell not installed (optional)"; \
+	fi
+	@echo ""
+	@echo "✓ Go Report Card check completed!"
+
+# Install quality check tools
+install-tools:
+	@echo "Installing Go quality check tools..."
+	go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+	go install github.com/gordonklaus/ineffassign@latest
+	go install github.com/client9/misspell/cmd/misspell@latest
+	@echo "✓ Quality tools installed"
+
 # Full development check
-check: fmt vet test bench
+check: fmt-check vet test
+	@echo "✓ All quality checks passed!"
+
+# Code quality check for CI/release
+quality-check: mod-verify fmt-check vet test
+	@echo "✓ All quality checks passed - ready for release!"
 
 # Show benchmark results in a table format
 bench-table:

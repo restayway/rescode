@@ -21,7 +21,7 @@ func main() {
 		showVer = flag.Bool("version", false, "Show version information")
 		help    = flag.Bool("help", false, "Show help information")
 	)
-	
+
 	flag.Parse()
 
 	if *help {
@@ -71,7 +71,7 @@ func main() {
 		Package: packageName,
 		Errors:  errors,
 	}
-	
+
 	code, err := generator.Generate(config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Failed to generate code: %v\n", err)

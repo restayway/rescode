@@ -315,12 +315,12 @@ func TestGenerate_NoDescription(t *testing.T) {
 	}
 
 	codeStr := string(code)
-	
+
 	// Should not generate Desc constant
 	if strings.Contains(codeStr, "TestErrorDesc") {
 		t.Error("Generated code should not contain Desc constant when not provided")
 	}
-	
+
 	// Should still generate function
 	if !strings.Contains(codeStr, "func TestError(err ...error) *rescode.RC {") {
 		t.Error("Generated code should contain function even without description")
@@ -337,7 +337,7 @@ func BenchmarkParseInput_YAML(b *testing.B) {
   grpc: 5
   desc: Policy could not be located in the database
 `
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, err := ParseInput(strings.NewReader(yamlInput), "test.yaml")
@@ -349,7 +349,7 @@ func BenchmarkParseInput_YAML(b *testing.B) {
 
 func BenchmarkParseInput_JSON(b *testing.B) {
 	jsonInput := `[{"code": 20001, "key": "PolicyNotFound", "message": "Policy not found", "http": 404, "grpc": 5, "desc": "Policy could not be located in the database"}]`
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, err := ParseInput(strings.NewReader(jsonInput), "test.json")
@@ -373,7 +373,7 @@ func BenchmarkGenerate(b *testing.B) {
 			},
 		},
 	}
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, err := Generate(config)

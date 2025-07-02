@@ -10,7 +10,7 @@ import (
 // Test the generated error factories
 func TestPolicyNotFound(t *testing.T) {
 	err := PolicyNotFound()
-	
+
 	if err.Code != PolicyNotFoundCode {
 		t.Errorf("Expected Code %d, got %d", PolicyNotFoundCode, err.Code)
 	}
@@ -31,11 +31,11 @@ func TestPolicyNotFound(t *testing.T) {
 func TestPolicyNotFound_WithWrappedError(t *testing.T) {
 	originalErr := errors.New("database connection failed")
 	err := PolicyNotFound(originalErr)
-	
+
 	if err.OriginalError() != originalErr {
 		t.Errorf("Expected OriginalError() %v, got %v", originalErr, err.OriginalError())
 	}
-	
+
 	expectedErrorMsg := "Policy not found: database connection failed"
 	if err.Error() != expectedErrorMsg {
 		t.Errorf("Expected Error() %q, got %q", expectedErrorMsg, err.Error())
@@ -44,7 +44,7 @@ func TestPolicyNotFound_WithWrappedError(t *testing.T) {
 
 func TestInvalidKind(t *testing.T) {
 	err := InvalidKind()
-	
+
 	if err.Code != InvalidKindCode {
 		t.Errorf("Expected Code %d, got %d", InvalidKindCode, err.Code)
 	}
@@ -61,7 +61,7 @@ func TestInvalidKind(t *testing.T) {
 
 func TestInternalError(t *testing.T) {
 	err := InternalError()
-	
+
 	if err.Code != InternalErrorCode {
 		t.Errorf("Expected Code %d, got %d", InternalErrorCode, err.Code)
 	}
@@ -90,7 +90,7 @@ func TestErrorConstants(t *testing.T) {
 	if PolicyNotFoundMsg != "Policy not found" {
 		t.Errorf("Expected PolicyNotFoundMsg 'Policy not found', got %q", PolicyNotFoundMsg)
 	}
-	
+
 	if InvalidKindCode != 20002 {
 		t.Errorf("Expected InvalidKindCode 20002, got %d", InvalidKindCode)
 	}
@@ -107,9 +107,9 @@ func TestErrorConstants(t *testing.T) {
 
 func TestJSON_GeneratedErrors(t *testing.T) {
 	err := PolicyNotFound().SetData(map[string]string{"resource": "policy_123"})
-	
+
 	json := err.JSON()
-	
+
 	if json["code"] != PolicyNotFoundCode {
 		t.Errorf("Expected JSON code %d, got %v", PolicyNotFoundCode, json["code"])
 	}
@@ -122,7 +122,7 @@ func TestJSON_GeneratedErrors(t *testing.T) {
 	if json["message"] != PolicyNotFoundMsg {
 		t.Errorf("Expected JSON message %q, got %v", PolicyNotFoundMsg, json["message"])
 	}
-	
+
 	if dataMap, ok := json["data"].(map[string]string); !ok {
 		t.Errorf("Expected data to be map[string]string, got %T", json["data"])
 	} else if dataMap["resource"] != "policy_123" {
