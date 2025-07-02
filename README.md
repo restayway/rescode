@@ -4,6 +4,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/restayway/rescode)](https://goreportcard.com/report/github.com/restayway/rescode)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+<img src="./assets/cover.png" alt="Rescode Logo" width="450" />
+
 Rescode is a robust, MIT-licensed, open-source Go code generator that produces type-safe error code constants and error creator functions from user-supplied JSON or YAML configuration. The generated code follows Go best practices, works seamlessly with `go:generate`, and enables high-performance, compile-time validated error handling without any runtime map/slice lookups.
 
 ## 🎯 Motivation
