@@ -26,6 +26,7 @@ go.work
 # OS files
 .DS_Store
 Thumbs.db
+coverage.html
 
 # Generated files in examples (keep for demonstration)
 # examples/*/errors_gen.go

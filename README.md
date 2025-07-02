@@ -9,6 +9,7 @@ Rescode is a robust, MIT-licensed, open-source Go code generator that produces t
 ## 🎯 Motivation
 
 Traditional error handling in Go often involves:
+
 - Runtime map lookups for error metadata
 - String-based error codes prone to typos
 - Inconsistent error response formats
@@ -16,6 +17,7 @@ Traditional error handling in Go often involves:
 - Poor performance due to runtime lookups
 
 Rescode solves these problems by generating type-safe, compile-time constants and factory functions that provide:
+
 - **Zero runtime lookups** - All metadata is compile-time constants
 - **Type safety** - No magic strings or runtime errors
 - **High performance** - Up to 140x faster than map-based approaches
@@ -271,27 +273,86 @@ func (r *RC) String() string
 
 ## 📊 Performance Benchmarks
 
-Rescode dramatically outperforms traditional runtime map-based error handling:
+This library implements multiple error handling approaches in Go. The benchmarks below compare their performance on an Apple M4 Pro (arm64):
 
-```
-BenchmarkGenerated_PolicyNotFound-2         1000000000    0.31 ns/op    0 B/op    0 allocs/op
-BenchmarkLegacy_PolicyNotFound-2                26802039   45.16 ns/op   80 B/op    1 allocs/op
+| Approach       | Description                      |
+| -------------- | -------------------------------- |
+| **Generated**  | Compile-time optimized (current) |
+| **Legacy**     | Runtime map lookup               |
+| **StaticCode** | Static constants + maps          |
+| **VarCode**    | Variable declarations + maps     |
 
-BenchmarkGenerated_MultipleErrors-2         1000000000    0.94 ns/op    0 B/op    0 allocs/op
-BenchmarkLegacy_MultipleErrors-2                25338333   45.99 ns/op   80 B/op    1 allocs/op
-```
+### Benchmark Metrics
 
-**Results Summary:**
-- **145x faster** error creation
-- **Zero allocations** vs 1 allocation per error
-- **Zero memory usage** vs 80 bytes per error
-- **Consistent performance** regardless of error count
+- **ns/op**: nanoseconds per operation *(lower is better)*
+- **B/op**: bytes allocated per operation *(lower is better)*
+- **allocs/op**: allocations per operation *(lower is better)*
 
-The performance improvement comes from:
-1. **Compile-time constants** - No runtime lookups
-2. **Pre-allocated creators** - Functions generated at compile time
-3. **Zero reflection** - Direct struct initialization
-4. **No map access** - All metadata embedded in code
+---
+
+### Leaderboard: Fastest Results per Test
+
+| Test           | Best Approach | Best ns/op | B/op | allocs/op | Notes                                       |
+| -------------- | ------------- | ---------- | ---- | --------- | ------------------------------------------- |
+| PolicyNotFound | Generated     | **0.2276** | 0    | 0         | Over 70x faster than next best, 0 alloc     |
+| MultipleErrors | Generated     | **0.4231** | 0    | 0         | Over 40x faster than next best, 0 alloc     |
+| ErrorMessage   | Generated     | **0.2377** | 0    | 0         | Orders of magnitude faster, 0 alloc         |
+| JSON           | VarCode       | **111.0**  | 384  | 6         | All approaches within 4 ns/op of each other |
+
+---
+
+### Raw Benchmark Results
+
+<details>
+<summary>Expand for full benchmark output</summary>
+
+<pre>
+go test -bench="PolicyNotFound$|MultipleErrors$|ErrorMessage$|JSON$" -benchmem -count=5
+goos: darwin
+goarch: arm64
+cpu: Apple M4 Pro
+
+PolicyNotFound
+  Generated     0.2276 ns/op    0 B/op    0 allocs/op
+  Legacy       19.30 ns/op     80 B/op   1 allocs/op
+  StaticCode   17.52 ns/op     80 B/op   1 allocs/op
+  VarCode      18.15 ns/op     80 B/op   1 allocs/op
+
+MultipleErrors
+  Generated     0.4231 ns/op    0 B/op    0 allocs/op
+  Legacy       20.44 ns/op     80 B/op   1 allocs/op
+  StaticCode   19.28 ns/op     80 B/op   1 allocs/op
+  VarCode      19.13 ns/op     80 B/op   1 allocs/op
+
+ErrorMessage
+  Generated     0.2377 ns/op    0 B/op    0 allocs/op
+  Legacy        9.365 ns/op     0 B/op    0 allocs/op
+  StaticCode    9.525 ns/op     0 B/op    0 allocs/op
+  VarCode       9.547 ns/op     0 B/op    0 allocs/op
+
+JSON
+  Generated   112.0 ns/op    384 B/op    6 allocs/op
+  Legacy      111.4 ns/op    384 B/op    6 allocs/op
+  StaticCode  112.5 ns/op    384 B/op    6 allocs/op
+  VarCode     111.0 ns/op    384 B/op    6 allocs/op
+</pre>
+
+</details>
+
+---
+
+### Observations
+
+- The **Generated** (compile-time) approach is **orders of magnitude faster** for simple error creation, with zero allocations.
+- For error messages, all static approaches (Legacy/StaticCode/VarCode) are very close in performance.
+- For JSON serialization, **all approaches perform nearly identically**, limited by Go’s native map/interface allocation and JSON encoding overhead.
+- In typical usage, any of these approaches is fast enough; only in high-throughput or critical-path code will the differences matter.
+
+---
+
+> **Tip:**
+> If you require both dynamic error construction and zero-allocation performance, prefer the **Generated** approach for hot paths.
+> For API/JSON serialization, all approaches have similar performance due to Go’s encoding/json design.
 
 ## 🏗️ Examples
 
@@ -304,6 +365,7 @@ See [examples/basic/](examples/basic/) for a complete basic example.
 See [examples/microservice/](examples/microservice/) for a full HTTP service example with error handling.
 
 Key features demonstrated:
+
 - HTTP status code mapping
 - JSON error responses
 - Error data attachment
@@ -325,6 +387,7 @@ go test -bench=. -benchmem
 ```
 
 The project maintains >95% test coverage with comprehensive tests for:
+
 - Core error functionality
 - Code generation
 - CLI tool

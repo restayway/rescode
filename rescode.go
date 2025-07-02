@@ -28,7 +28,7 @@ func New(code uint64, hCode int, rCode codes.Code, message string, data ...any) 
 	if len(data) > 0 {
 		d = data[0]
 	}
-	
+
 	return func(errs ...error) *RC {
 		rc := &RC{
 			Code:     code,
@@ -37,11 +37,11 @@ func New(code uint64, hCode int, rCode codes.Code, message string, data ...any) 
 			RpcCode:  rCode,
 			Data:     d,
 		}
-		
+
 		if len(errs) > 0 {
 			rc.err = errs[0]
 		}
-		
+
 		return rc
 	}
 }
@@ -49,7 +49,7 @@ func New(code uint64, hCode int, rCode codes.Code, message string, data ...any) 
 // Error implements the error interface.
 func (r *RC) Error() string {
 	if r.err != nil {
-		return fmt.Sprintf("%s: %v", r.Message, r.err)
+		return r.Message + ": " + r.err.Error()
 	}
 	return r.Message
 }
@@ -68,15 +68,15 @@ func (r *RC) JSON(keys ...string) map[string]interface{} {
 		"httpCode": r.HttpCode,
 		"rpcCode":  int(r.RpcCode),
 	}
-	
+
 	if r.Data != nil {
 		result["data"] = r.Data
 	}
-	
+
 	if r.err != nil {
 		result["originalError"] = r.err.Error()
 	}
-	
+
 	// If specific keys are requested, filter the result
 	if len(keys) > 0 {
 		filtered := make(map[string]interface{})
@@ -87,7 +87,7 @@ func (r *RC) JSON(keys ...string) map[string]interface{} {
 		}
 		return filtered
 	}
-	
+
 	return result
 }
 
@@ -103,14 +103,14 @@ func (r *RC) String() string {
 	parts = append(parts, fmt.Sprintf("HTTP:%d", r.HttpCode))
 	parts = append(parts, fmt.Sprintf("gRPC:%d", r.RpcCode))
 	parts = append(parts, fmt.Sprintf("Message:%s", r.Message))
-	
+
 	if r.Data != nil {
 		parts = append(parts, fmt.Sprintf("Data:%v", r.Data))
 	}
-	
+
 	if r.err != nil {
 		parts = append(parts, fmt.Sprintf("OriginalError:%v", r.err))
 	}
-	
+
 	return fmt.Sprintf("RC{%s}", strings.Join(parts, ", "))
 }
