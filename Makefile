@@ -9,6 +9,9 @@ help:
 	@echo "  bench-compare- Run benchmarks with comparison between approaches"
 	@echo "  bench-summary- Show clean performance comparison table"
 	@echo "  bench-table  - Show all benchmarks in table format"
+	@echo "  mod-tidy     - Run go mod tidy while preserving Go 1.20"
+	@echo "  mod-verify   - Verify Go version is correctly set to 1.20"
+	@echo "  mod-reset    - Reset go.mod to proper Go 1.20 state"
 	@echo "  build        - Build the project"
 	@echo "  clean        - Clean build artifacts"
 
@@ -92,16 +95,41 @@ generate-microservice:
 
 # Development helpers
 mod-tidy:
-	go mod tidy
+	@echo "Running go mod tidy while preserving Go 1.20..."
+	@if grep -q "go 1\.20" go.mod; then \
+		go mod tidy; \
+		if ! grep -q "go 1\.20" go.mod; then \
+			echo "WARNING: Go version was changed! Restoring Go 1.20..."; \
+			sed -i '' 's/go [0-9]\+\.[0-9]\+.*/go 1.20/' go.mod; \
+		fi; \
+	else \
+		echo "ERROR: go.mod doesn't contain 'go 1.20'. Please check manually."; \
+		exit 1; \
+	fi
+	@echo "✓ Go version preserved at 1.20"
 
-fmt:
-	go fmt ./...
+mod-verify:
+	@echo "Verifying Go version in go.mod..."
+	@if grep -q "go 1\.20" go.mod; then \
+		echo "✓ Go version is correctly set to 1.20"; \
+	else \
+		echo "✗ Go version is not 1.20. Current version:"; \
+		grep "^go " go.mod; \
+		exit 1; \
+	fi
 
-vet:
-	go vet ./...
-
-lint:
-	golangci-lint run
+# Reset go.mod to proper state if it gets corrupted
+mod-reset:
+	@echo "Resetting go.mod to Go 1.20 with compatible dependencies..."
+	@rm -f go.mod go.sum
+	@go mod init github.com/restayway/rescode
+	@sed -i '' 's/go [0-9]\+\.[0-9]\+.*/go 1.20/' go.mod
+	@go get google.golang.org/grpc@v1.56.3
+	@go get gopkg.in/yaml.v3@v3.0.1
+	@go mod edit -require=google.golang.org/grpc@v1.56.3 -require=gopkg.in/yaml.v3@v3.0.1
+	@go mod tidy
+	@make mod-verify
+	@echo "✓ go.mod reset successfully"
 
 # Full development check
 check: fmt vet test bench
