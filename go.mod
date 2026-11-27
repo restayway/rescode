@@ -1,6 +1,6 @@
 module github.com/restayway/rescode
 
-go 1.20
+go 1.27.4
 
 require (
 	google.golang.org/grpc v1.56.3
